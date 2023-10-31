@@ -4,8 +4,9 @@ import AppForm from './components/AppForm';
 import logo from './logo.svg';
 //import './App.css';
 import C01componente from './pagina/C01componente';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore';
 import { db } from './components/firebase';
+import { deleteApp } from 'firebase/app';
 
 function App() {
   ////// READ - LECTURA - fnRead //////////
@@ -29,7 +30,11 @@ function App() {
 
   ////// DELETE - Eliminar - fnDelete /////
   const [idActual, setIdActual] = useState("");
-  const fnDelete = (xId) => {
+  const fnDelete = async (xId) => {
+    if(window.confirm("Confirme para eliminar")){
+      await deleteDoc(doc(db, "persona", xId));
+      alert("Se elimino con éxito...");
+    }
   }
 
   return (

@@ -1,26 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { db } from './firebase';
 import { useState } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 
-const AppForm = () => {
+const AppForm = (props) => {
   
   ///////////// GUARDAR / ACTUALIZAR ////////
   const camposRegistro = { nombre:"", edad:"", genero:""}
   const [objeto, setObjeto] = useState(camposRegistro);
-  console.log(objeto);
+  //console.log(objeto);
 
-  const handleSubmit = (e) => {   //manejador de submit
+  const handleSubmit = async (e) => {   //manejador de submit
     e.preventDefault();
     try {
-
-      if(validarForm()){
-        addDoc(collection(db, 'persona'), objeto);
-        console.log("Se guardo con exito");
-      }else{
-        console.log("No se guardo");
+      if(props.idActual === ""){      ///GUARDAR
+        if(validarForm()){
+          addDoc(collection(db, 'persona'), objeto);
+          console.log("Se guardo con exito");
+        }else{
+          console.log("No se guardo");
+        }
+      }else{                          //actualizar
+        await updateDoc(doc(collection(db, "persona"), props.idActual), objeto);
+        alert("Se actualizo");
+        props.setIdActual('');
       }
+      setObjeto(camposRegistro);
     } catch (error) {
       console.error();
     }
@@ -43,6 +49,27 @@ const AppForm = () => {
     return true;
   }
 
+  ///////// Obtener datos de BD ////////
+  useEffect(() => {
+    if(props.idActual===""){
+      setObjeto({...camposRegistro});
+    }else{
+      obtenerDatosPorId(props.idActual);
+    }
+  }, [props.idActual]);
+
+  const obtenerDatosPorId = async (xId) => {
+    const objPorId = doc(db, "persona", xId);
+    const docPorId = await getDoc(objPorId);
+    if(docPorId.exists()){
+      setObjeto(docPorId.data());
+    }else{
+      alert("No hay doc...");
+      //console.log("No hay doc...");
+    }
+  }
+
+
   return (
     <div style={{background:"orange", padding:"10px", textAlign:"center"}}>
       <form onSubmit={handleSubmit}>
@@ -57,13 +84,13 @@ const AppForm = () => {
          type='text' placeholder='Edad...' /> <br/>
 
         <select onChange={handleStatusChange} 
-          name='genero' > 
-          <option value="">Seleccione genero...</option>
+          name='genero' value={objeto.genero} > 
+          <option value="">Seleccione género...</option>
           <option value="M"> Masculino </option>
           <option value="F"> Femenino </option>
         </select> <br />
         <button>
-          Guardar / Actualizar
+          {props.idActual === "" ? "Guardar" : "Actualizar"}
         </button>
       </form>
     </div>
