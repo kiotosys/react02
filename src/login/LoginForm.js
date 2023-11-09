@@ -31,21 +31,37 @@ function LoginForm() {
   }
 
   return (
-    <div id='public'>
-      <h2>Iniciar Sesión ok</h2>
-      <form onSubmit={handleSignIn}>
-        <div>
-          <label>Email:</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+    <center>
+      <form className='card card-body' onSubmit={handleSignIn} style={{ maxWidth:"600px"}}>
+
+        <button className='btn btn-warning btn-block'>
+          Iniciar Sesión
+        </button>
+
+        <div className='form-group input-group'>
+          <div className='input-group-text bd-light'>
+            <i className='material-icons'>group_add</i>
+          </div>
+          <input className='form-control float-start' type='text' placeholder='Correo...'  
+            onChange={(e) => setEmail(e.target.value)} value={email} />
         </div>
-        <div>
-          <label>Contraseña:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+        <div className='form-group input-group'>
+          <div className='input-group-text bd-light'>
+            <i className='material-icons'>star_half</i>
+          </div>
+          <input className='form-control float-start' placeholder='Contraseña...'  
+            type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Iniciar Sesión</button>
+          
+        <button className='btn btn-primary btn-block'>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          Iniciar Sesión
+        </button>
+
       </form>
-    </div>
+
+    </center>
   );
 }
 

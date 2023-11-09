@@ -9,15 +9,18 @@ import { useNavigate } from 'react-router-dom';
    
 ///////////////// PROTEGIDA - SistemaCRUD //////////////
 import SistemaCRUD from '../protegido/SistemaCRUD';
-import ListaDeAlumnos from '../protegido/sistemacrud/ListaDeAlumnos';
+
 
 ///////////////// PROTEGIDA - SistemaFILE //////////////
 import SistemaFILE from '../protegido/SistemaFILE';
 import Fotos from '../protegido/sistemafile/Fotos';
+import Documentos from '../protegido/sistemafile/Documentos';
 
 //////////////////////// PAG. PUBLICOS /////////////////
 import RegisterForm from '../login/RegisterForm';
 import LoginForm from '../login/LoginForm';
+import AppLista from '../protegido/sistemacrud/AppLista';
+import ListaDeProfesores from '../protegido/sistemacrud/ListaDeProfesores';
 
 const BarraRutasProtected = () => {
     const { user } = useAuth();
@@ -25,25 +28,48 @@ const BarraRutasProtected = () => {
     const navigate = useNavigate();
   
     const handleSignOut = () => {
+      if (user) {
+        signOut(auth)
+          .then(() => {
+            // Cierre de sesión exitoso
+            navigate('/home'); // Redirigir a ruta /home
+          })
+          .catch((error) => {
+            console.error('Error al cerrar sesión:', error);
+          });
+      }
     }
   
     return (
-      <div style={{ background:"royalblue", padding:"10px" }}>
+      <div>
         <nav>
           <div id="login">
             <ul>
+               
+              {user ? (         ////////  Para cerrar sesión   ///////////
+                <li><Link onClick={handleSignOut} > Cerrar sesión </Link> </li> 
+                ) : (
+                <li> <Link to="/iniciarsesion">Iniciar sesión</Link> </li>
+              )}
+
               <li><Link to="/nuevoregistro">Registrar</Link></li>
-  
-              <li><Link onClick={handleSignOut} >Cerrar sesión</Link> </li> 
+
+              {user ? (         ////////  Usuario autenticado  ///////////
+                <li>Usuario autenticado: <span> {user.email}</span> </li> 
+                ) : (
+                null
+              )} 
   
             </ul>
           </div>
               
           <div id="menu">
             <ul>
-              <li><Link to="/sistema-crud/alumnos">Alumnos</Link> </li>
+              <li><Link to="/sistema-crud/applista">Alumnos(App-Lista)</Link> </li>
+              <li><Link to="/sistema-crud/prof">Profesores</Link> </li>
                       
               <li><Link to="/sistema-file/fotos">Fotos</Link> </li>
+              <li><Link to="/sistema-file/docword">Doc. Word</Link> </li>
             </ul>
           </div>
         </nav>
@@ -56,13 +82,16 @@ const BarraRutasProtected = () => {
           
           <Route path="/sistema-crud" element={<MarcoParaSistemaCRUD />}>
             <Route index element={<SistemaCRUD />} />
-            <Route path="alumnos" element={<ListaDeAlumnos />} />
+            <Route path="applista" element={<AppLista />} />
+            <Route path="prof" element={<ListaDeProfesores />} />
+            
           </Route>
   
   
           <Route path="/sistema-file" element={<MarcoParaSistemaFILE />}>
             <Route index element={<SistemaFILE />} />
             <Route path="fotos" element={<Fotos />} />
+            <Route path="docword" element={<Documentos />} />
           </Route>
   
         </Routes>        
@@ -74,7 +103,7 @@ export default BarraRutasProtected;
 
 function MarcoParaSistemaCRUD() {
     return (
-      <div style={{background:"cornflowerblue", padding:"10px"}}>
+      <div>
         <h1>Marco sistema CRUD</h1>
         < Outlet /> {/* Aquí se mostrarán las rutas secundarias */}
       </div>
